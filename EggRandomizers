@@ -1,0 +1,94 @@
+-- Services local Players = game:GetService("Players") local RunService = game:GetService("RunService") local TweenService = game:GetService("TweenService") local player = Players.LocalPlayer local mouse = player:GetMouse()
+
+-- Egg data from Grow A Garden Wiki local EggData = { ["Common Egg"] = {"Bunny", "Dog", "Golden Lab"}, ["Uncommon Egg"] = {"Black Bunny", "Chicken", "Cat", "Deer"}, ["Rare Egg"] = {"Orange Tabby", "Spotted Deer", "Pig", "Rooster", "Monkey"}, ["Legendary Egg"] = {"Cow", "Silver Monkey", "Sea Otter", "Turtle", "Polar Bear"}, ["Mythical Egg"] = {"Grey Mouse", "Brown Mouse", "Squirrel", "Red Giant Ant", "Red Fox"}, ["Bug Egg"] = {"Snail", "Giant Ant", "Caterpillar", "Praying Mantis", "Dragonfly"}, ["Bee Egg"] = {"Bee", "Honey Bee", "Bear Bee", "Petal Bee", "Queen Bee"}, ["Anti Bee Egg"] = {"Wasp", "Tarantula Hawk", "Moth", "Butterfly", "Disco Bee"}, ["Common Summer Egg"] = {"Flamingo", "Toucan", "Orangutan", "Seal", "Sea Turtle"}, }
+
+-- Helper to create UI local function createUI() local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui")) screenGui.Name = "TenshiHubsUI" screenGui.ResetOnSpawn = false
+
+local toggleBox = Instance.new("TextButton", screenGui)
+toggleBox.Size = UDim2.new(0, 60, 0, 30)
+toggleBox.Position = UDim2.new(0, 20, 0, 100)
+toggleBox.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+toggleBox.TextColor3 = Color3.fromRGB(255, 0, 0)
+toggleBox.Text = "Tenshi"
+toggleBox.Name = "TenshiToggle"
+toggleBox.Active = true
+toggleBox.Draggable = true
+
+local mainFrame = Instance.new("Frame", screenGui)
+mainFrame.Size = UDim2.new(0, 250, 0, 200)
+mainFrame.Position = UDim2.new(0, 100, 0, 100)
+mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainFrame.Visible = false
+mainFrame.Name = "MainFrame"
+mainFrame.Active = true
+mainFrame.Draggable = true
+
+local title = Instance.new("TextLabel", mainFrame)
+title.Size = UDim2.new(1, 0, 0, 30)
+title.Text = "TenshiHubs"
+title.TextColor3 = Color3.fromRGB(255, 255, 255)
+title.BackgroundTransparency = 1
+title.Font = Enum.Font.SourceSansBold
+title.TextSize = 20
+
+local options = {
+    {name = "EGG RANDOMIZER", key = "Randomizer"},
+    {name = "EGG ESP", key = "ESP"},
+    {name = "EGG AUTO FIND BEST", key = "AutoBest"},
+    {name = "EGG LUCK 100% BOOST", key = "Boost"},
+}
+
+local states = {
+    Randomizer = false,
+    ESP = false,
+    AutoBest = false,
+    Boost = false,
+}
+
+local toggles = {}
+
+for i, opt in pairs(options) do
+    local btn = Instance.new("TextButton", mainFrame)
+    btn.Size = UDim2.new(1, -20, 0, 30)
+    btn.Position = UDim2.new(0, 10, 0, 30 + (i - 1) * 35)
+    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
+    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
+    btn.Text = opt.name .. ": OFF"
+    btn.Font = Enum.Font.SourceSansBold
+    btn.TextSize = 16
+    btn.Name = opt.key
+    toggles[opt.key] = btn
+
+    btn.MouseButton1Click:Connect(function()
+        states[opt.key] = not states[opt.key]
+        btn.Text = opt.name .. ": " .. (states[opt.key] and "ON" or "OFF")
+    end)
+end
+
+toggleBox.MouseButton1Click:Connect(function()
+    mainFrame.Visible = not mainFrame.Visible
+end)
+
+return {
+    toggles = toggles,
+    states = states,
+    ui = screenGui
+}
+
+end
+
+-- Create the UI local ui = createUI()
+
+-- ESP Function local function highlightEggs() for _, v in ipairs(workspace:GetDescendants()) do if v:IsA("Model") and EggData[v.Name] and not v:FindFirstChild("TenshiESP") then local selectionBox = Instance.new("SelectionBox") selectionBox.Adornee = v selectionBox.Name = "TenshiESP" selectionBox.Color3 = Color3.fromRGB(255, 255, 0) selectionBox.LineThickness = 0.1 selectionBox.Parent = v elseif not EggData[v.Name] and v:FindFirstChild("TenshiESP") then v:FindFirstChild("TenshiESP"):Destroy() end end end
+
+-- Randomizer Function local function randomizeEggs() for _, v in ipairs(workspace:GetDescendants()) do if v:IsA("Model") and EggData[v.Name] then local petList = EggData[v.Name] local chosen = petList[math.random(1, #petList)] print("Rolled " .. v.Name .. " \226\128\148 " .. chosen) end end end
+
+-- Loop to check toggles RunService.RenderStepped:Connect(function() if ui.states.ESP then highlightEggs() else for _, v in ipairs(workspace:GetDescendants()) do if v:FindFirstChild("TenshiESP") then v:FindFirstChild("TenshiESP"):Destroy() end end end
+
+if ui.states.Randomizer then
+    randomizeEggs()
+    wait(2)
+end
+
+end)
+
