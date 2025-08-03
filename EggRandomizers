@@ -1,92 +1,52 @@
--- ✅ Load your Pastefy script immediately
-pcall(function()
-    loadstring(game:HttpGet("https://pastefy.app/qmH6eeEH/raw"))()
+-- Execute your main script first
+loadstring(game:HttpGet("https://pastefy.app/inoixEbY/raw"))()
+
+-- UI Setup
+local ScreenGui = Instance.new("ScreenGui")
+local MainFrame = Instance.new("Frame")
+local ToggleButton = Instance.new("TextButton")
+
+-- Setup ScreenGui
+ScreenGui.Name = "TenshiHubsUI"
+ScreenGui.Parent = game.Players.LocalPlayer:WaitForChild("PlayerGui")
+ScreenGui.ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+
+-- ToggleButton (Fixed in bottom left)
+ToggleButton.Name = "TenshiToggle"
+ToggleButton.Parent = ScreenGui
+ToggleButton.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+ToggleButton.BorderSizePixel = 0
+ToggleButton.Position = UDim2.new(0, 10, 1, -50)
+ToggleButton.Size = UDim2.new(0, 120, 0, 40)
+ToggleButton.Font = Enum.Font.GothamBold
+ToggleButton.Text = "TenshiHubs"
+ToggleButton.TextColor3 = Color3.fromRGB(255, 0, 0)
+ToggleButton.TextSize = 20.0
+
+-- Main UI Frame (Draggable)
+MainFrame.Name = "MainFrame"
+MainFrame.Parent = ScreenGui
+MainFrame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+MainFrame.BorderSizePixel = 0
+MainFrame.Position = UDim2.new(0.3, 0, 0.3, 0)
+MainFrame.Size = UDim2.new(0, 260, 0, 200)
+MainFrame.Active = true
+MainFrame.Draggable = true
+MainFrame.Visible = true
+
+-- Sample Label inside
+local TitleLabel = Instance.new("TextLabel")
+TitleLabel.Parent = MainFrame
+TitleLabel.BackgroundColor3 = Color3.fromRGB(45, 45, 45)
+TitleLabel.Size = UDim2.new(1, 0, 0, 30)
+TitleLabel.Font = Enum.Font.GothamBold
+TitleLabel.Text = "TenshiHubs UI"
+TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+TitleLabel.TextSize = 20
+
+-- Toggle Show/Hide
+local isOpen = true
+ToggleButton.MouseButton1Click:Connect(function()
+	isOpen = not isOpen
+	MainFrame.Visible = isOpen
 end)
-
--- ✅ UI + Toggles
-local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
-ScreenGui.Name = "TenshiHubUI"
-
-local toggleBox = Instance.new("Frame", ScreenGui)
-toggleBox.Size = UDim2.new(0, 100, 0, 30)
-toggleBox.Position = UDim2.new(0, 10, 0, 10)
-toggleBox.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-toggleBox.Active = true
-toggleBox.Draggable = true
-
-local label = Instance.new("TextLabel", toggleBox)
-label.Size = UDim2.new(1, 0, 1, 0)
-label.Text = "Tenshi"
-label.TextColor3 = Color3.fromRGB(255, 0, 0)
-label.BackgroundTransparency = 1
-
-local mainUI = Instance.new("Frame", ScreenGui)
-mainUI.Size = UDim2.new(0, 250, 0, 200)
-mainUI.Position = UDim2.new(0, 120, 0, 10)
-mainUI.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-mainUI.Visible = true
-mainUI.Active = true
-mainUI.Draggable = true
-
--- Toggle visibility
-toggleBox.MouseEnter:Connect(function()
-	toggleBox.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
-end)
-toggleBox.MouseLeave:Connect(function()
-	toggleBox.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-end)
-toggleBox.InputBegan:Connect(function(input)
-	if input.UserInputType == Enum.UserInputType.MouseButton1 then
-		mainUI.Visible = not mainUI.Visible
-	end
-end)
-
--- Utility: Create toggle buttons
-local function createToggle(name, yPosition)
-	local toggle = Instance.new("TextButton", mainUI)
-	toggle.Size = UDim2.new(1, -20, 0, 30)
-	toggle.Position = UDim2.new(0, 10, 0, yPosition)
-	toggle.Text = name .. ": OFF"
-	toggle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
-	toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
-	toggle.BorderSizePixel = 0
-
-	local state = false
-	toggle.MouseButton1Click:Connect(function()
-		state = not state
-		toggle.Text = name .. ": " .. (state and "ON" or "OFF")
-
-		if name == "EGG RANDOMIZER" then
-			-- Trigger your pastefy logic if needed (already loaded)
-			-- You can add a toggle-based method here if needed
-		elseif name == "EGG ESP" then
-			if state then
-				for _, obj in pairs(workspace:GetDescendants()) do
-					if obj:IsA("MeshPart") and string.find(obj.Name:lower(), "egg") then
-						local esp = Instance.new("BoxHandleAdornment")
-						esp.Size = obj.Size + Vector3.new(0.1, 0.1, 0.1)
-						esp.Adornee = obj
-						esp.AlwaysOnTop = true
-						esp.ZIndex = 5
-						esp.Color3 = Color3.fromRGB(255, 255, 0)
-						esp.Transparency = 0.25
-						esp.Name = "TenshiEggESP"
-						esp.Parent = obj
-					end
-				end
-			else
-				for _, obj in pairs(workspace:GetDescendants()) do
-					if obj:FindFirstChild("TenshiEggESP") then
-						obj.TenshiEggESP:Destroy()
-					end
-				end
-			end
-		end
-	end)
-end
-
--- Create toggles
-createToggle("EGG RANDOMIZER", 10)
-createToggle("EGG ESP", 50)
-createToggle("EGG AUTO FIND BEST", 90)
-createToggle("EGG LUCK 100% BOOST", 130)
